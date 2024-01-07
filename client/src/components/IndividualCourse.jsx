@@ -1,7 +1,10 @@
+// IndividualCourse.js
+
+// Import React and necessary modules
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Logout from "./Logout";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   getSchedule,
   allInstructors,
@@ -15,12 +18,7 @@ const ceruleanBlue = "#007ba7";
 const ivoryCream = "#fffdd0";
 const darkGray = "#333333";
 const sageGreen = "#8f9779";
-const pearlGray = "#d3d3d3";
 const dustyRose = "#d2b48c";
-const silverMist = "#c0c0c0";
-const champagnePink = "#fad6a5";
-const platinumFrost = "#c0c0c0";
-const turquoiseBlue = "#40e0d0";
 const velvetNavy = "#001f3f";
 const white = "#ffffff";
 
@@ -66,8 +64,15 @@ const CardList = styled.div`
   margin-top: 20px;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around; /* You can experiment with different values */
-  align-items: flex-start; /* Added align-items property */
+  justify-content: space-around;
+  align-items: flex-start;
+`;
+
+const NoScheduleMessage = styled.p`
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+  color: ${white};
 `;
 
 const Card = styled.div`
@@ -76,7 +81,7 @@ const Card = styled.div`
   border-radius: 15px;
   margin-bottom: 20px;
   padding: 20px;
-  width: calc(45% - 20px); /* Adjusted width calculation to include margin */
+  width: calc(45% - 20px);
   box-sizing: border-box;
   transition: transform 0.2s ease-in-out;
   overflow: hidden;
@@ -129,7 +134,7 @@ const Form = styled.form`
   button {
     margin-top: 20px;
     padding: 10px;
-    background-color: ${champagnePink};
+    background-color: ${dustyRose};
     color: ${white};
     border: none;
     border-radius: 5px;
@@ -137,30 +142,31 @@ const Form = styled.form`
     font-size: 16px;
 
     &:hover {
-      background-color: ${dustyRose};
+      background-color: ${sageGreen};
     }
   }
 `;
 
+// IndividualCourse component
 const IndividualCourse = () => {
+  // Hooks for managing state
   const { courseId } = useParams();
   const navigate = useNavigate();
-  // const [currUser, setCurrUser] = useState(undefined);
-  const [instructors, setInstructors] = useState([]);
   const [dropDropUser, setDropUser] = useState(undefined);
   const [id, setId] = useState(null);
   const [courseName, setCourseName] = useState("Dummy Course");
   const [instructorData, setInstructorData] = useState([]);
   const [selectedInstructor, setSelectedInstructor] = useState("");
-  const [schedule,setSchedule]=useState([])
+  const [schedule, setSchedule] = useState([]);
 
+  // Keys for local storage
   const adminKey = localStorage.getItem("secret-key-admin");
   const userKey = localStorage.getItem("secret-key");
 
+  // Effect hook to check user authentication
   useEffect(() => {
     if (adminKey) {
       const adminUserData = JSON.parse(adminKey);
-      // setCurrUser(adminUserData);
       setId(adminUserData._id);
     } else if (userKey) {
       navigate("/instructor");
@@ -169,6 +175,7 @@ const IndividualCourse = () => {
     }
   }, [navigate, adminKey, userKey]);
 
+  // Function to update instructor data
   const updateInstructorData = (instructor) => {
     const existingInstructor = instructorData.find(
       (i) => i === instructor.username
@@ -178,6 +185,7 @@ const IndividualCourse = () => {
     }
   };
 
+  // Function to get course name by ID
   const getCourseNameById = async (courseId) => {
     try {
       const response = await axios.get(`${getCourseName}/${courseId}`);
@@ -188,6 +196,7 @@ const IndividualCourse = () => {
     }
   };
 
+  // Effect hook to fetch course name
   useEffect(() => {
     const fetchCourseName = async () => {
       try {
@@ -201,13 +210,13 @@ const IndividualCourse = () => {
     fetchCourseName();
   }, [courseId]);
 
+  // Effect hook to fetch instructors
   useEffect(() => {
     const fetchInstructors = async () => {
       try {
         if (id) {
           const response = await axios.get(`${allInstructors}/${id}`);
           const fetchedInstructors = response.data;
-          setInstructors(fetchedInstructors);
           fetchedInstructors.forEach(updateInstructorData);
         }
       } catch (error) {
@@ -217,6 +226,7 @@ const IndividualCourse = () => {
     fetchInstructors();
   }, [id]);
 
+  // State for lecture data
   const [lectureData, setLectureData] = useState({
     instructor: "",
     date: "",
@@ -225,6 +235,7 @@ const IndividualCourse = () => {
     location: "",
   });
 
+  // Event handler for input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setLectureData((prevData) => ({
@@ -233,23 +244,24 @@ const IndividualCourse = () => {
     }));
   };
 
+  // Event handler for instructor selection
   const handleInstructorSelection = (e) => {
     const selectedInstructor = e.target.value;
     setDropUser(selectedInstructor);
-    setSelectedInstructor(selectedInstructor); // Assuming you also want to update the selected instructor for other purposes
+    setSelectedInstructor(selectedInstructor);
   };
 
-  useEffect(() => {
-  }, [setDropUser]);
+  // Effect hook for instructor selection
+  useEffect(() => {}, [setDropUser]);
 
+  // Event handler for form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Assuming the subject is the courseName
-    const subject = courseName;
+    const course = courseName;
 
     const scheduleData = {
-      course: subject,
+      course: course,
       lecture: lectureData.lecture,
       date: lectureData.date,
       instructor: dropDropUser,
@@ -271,6 +283,7 @@ const IndividualCourse = () => {
     });
   };
 
+  // Effect hook to fetch schedules
   useEffect(() => {
     const fetchSchedules = async () => {
       try {
@@ -282,11 +295,10 @@ const IndividualCourse = () => {
         console.error("Error fetching Schedule:", error);
       }
     };
-
-    // Run the effect on component mount and whenever there's a change in schedule or courseName
     fetchSchedules();
-  }, [courseName,dropDropUser,handleSubmit]); 
+  }, [courseName, dropDropUser, handleSubmit]);
 
+  // JSX for rendering the component
   return (
     <Container>
       <TopBar>
@@ -295,19 +307,26 @@ const IndividualCourse = () => {
         <Heading>Welcome admin</Heading>
       </TopBar>
       <ContentWrapper>
-        <CardList>
-          {schedule.map((scheduleItem, index) => (
-            <Card key={index}>
-              <div className="card-content">
-                <h2>Lecture: {scheduleItem.lecture}</h2>
-                <p>Instructor: {scheduleItem.instructor}</p>
-                <p>Date: {new Date(scheduleItem.date).toLocaleDateString()}</p>
-                <p>Location: {scheduleItem.location}</p>
-              </div>
-            </Card>
-          ))}
-        </CardList>
+        {schedule.length === 0 ? (
+          <NoScheduleMessage>No lectures scheduled.</NoScheduleMessage>
+        ) : (
+          <CardList>
+            {schedule.map((scheduleItem, index) => (
+              <Card key={index}>
+                <div className="card-content">
+                  <h2>Lecture: {scheduleItem.lecture}</h2>
+                  <p>Instructor: {scheduleItem.instructor}</p>
+                  <p>
+                    Date: {new Date(scheduleItem.date).toLocaleDateString()}
+                  </p>
+                  <p>Location: {scheduleItem.location}</p>
+                </div>
+              </Card>
+            ))}
+          </CardList>
+        )}
 
+        {/* Form for scheduling a lecture */}
         <Form onSubmit={handleSubmit}>
           <h2>Schedule a Lecture</h2>
           <select
@@ -340,7 +359,7 @@ const IndividualCourse = () => {
             required
           >
             <option value="" disabled>
-              Select Subject
+              Select Course
             </option>
             <option>{courseName}</option>
           </select>
@@ -367,4 +386,5 @@ const IndividualCourse = () => {
   );
 };
 
+// Export the IndividualCourse component
 export default IndividualCourse;
