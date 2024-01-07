@@ -1,12 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Logout from "../Logout";
+import { getUserSchedule } from "../../utils/APIRoutes";
+import axios from "axios";
 
-const Instructor = ({ }) => {
+import loaderImage from "../../assets/loader.gif";
+
+const Instructor = ({}) => {
   const navigate = useNavigate();
   const [currUser, setCurrUser] = useState(undefined);
+  const [schedules, setSchedules] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const adminKey = localStorage.getItem("secret-key-admin");
   const userKey = localStorage.getItem("secret-key");
@@ -15,12 +20,36 @@ const Instructor = ({ }) => {
     if (adminKey) {
       navigate("/admin");
     } else if (userKey) {
-      setCurrUser(JSON.parse(userKey)._id);
-      console.log(currUser);
+      setCurrUser(JSON.parse(userKey).username);
     } else {
       navigate("/");
     }
   }, [navigate]);
+
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      try {
+        const response = await axios.get(getUserSchedule, {
+          params: { currUser },
+        });
+        setSchedules(response.data.schedules);
+      } catch (error) {
+        console.error("Error fetching Schedule:", error);
+        console.log("Error");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSchedules();
+  }, [currUser, navigate, schedules]);
+
+  if (loading) {
+    return (
+      <LoaderContainer>
+        <LoaderImage src={loaderImage} alt="Loading..." />
+      </LoaderContainer>
+    );
+  }
 
   return (
     <WelcomeContainer>
@@ -32,98 +61,23 @@ const Instructor = ({ }) => {
         <LecturesContainer>
           <SectionHeading>Your Upcoming Lectures</SectionHeading>
           <ScrollableContent>
-            <LectureCard>
-              <CardHeading>Course:</CardHeading>
-              <CardContent>Sample Course</CardContent>
+            {schedules.map((schedule, index) => (
+              <LectureCard key={index}>
+                <CardHeading>Course:</CardHeading>
+                <CourseContent>{schedule.course}</CourseContent>
 
-              <CardHeading>Lecture:</CardHeading>
-              <CardContent>Sample Lecture</CardContent>
+                <CardHeading>Lecture:</CardHeading>
+                <LectureContent>{schedule.lecture}</LectureContent>
 
-              <CardHeading>Date:</CardHeading>
-              <CardContent>2024-01-01</CardContent>
+                <CardHeading>Date:</CardHeading>
+                <DateContent>
+                  {new Date(schedule.date).toLocaleDateString()}
+                </DateContent>
 
-              <CardHeading>Location:</CardHeading>
-              <CardContent>Sample Location</CardContent>
-            </LectureCard>
-            <LectureCard>
-              <CardHeading>Course:</CardHeading>
-              <CardContent>Sample Course</CardContent>
-
-              <CardHeading>Lecture:</CardHeading>
-              <CardContent>Sample Lecture</CardContent>
-
-              <CardHeading>Date:</CardHeading>
-              <CardContent>2024-01-01</CardContent>
-
-              <CardHeading>Location:</CardHeading>
-              <CardContent>Sample Location</CardContent>
-            </LectureCard>
-            <LectureCard>
-              <CardHeading>Course:</CardHeading>
-              <CardContent>Sample Course</CardContent>
-
-              <CardHeading>Lecture:</CardHeading>
-              <CardContent>Sample Lecture</CardContent>
-
-              <CardHeading>Date:</CardHeading>
-              <CardContent>2024-01-01</CardContent>
-
-              <CardHeading>Location:</CardHeading>
-              <CardContent>Sample Location</CardContent>
-            </LectureCard>
-            <LectureCard>
-              <CardHeading>Course:</CardHeading>
-              <CardContent>Sample Course</CardContent>
-
-              <CardHeading>Lecture:</CardHeading>
-              <CardContent>Sample Lecture</CardContent>
-
-              <CardHeading>Date:</CardHeading>
-              <CardContent>2024-01-01</CardContent>
-
-              <CardHeading>Location:</CardHeading>
-              <CardContent>Sample Location</CardContent>
-            </LectureCard>
-            <LectureCard>
-              <CardHeading>Course:</CardHeading>
-              <CardContent>Sample Course</CardContent>
-
-              <CardHeading>Lecture:</CardHeading>
-              <CardContent>Sample Lecture</CardContent>
-
-              <CardHeading>Date:</CardHeading>
-              <CardContent>2024-01-01</CardContent>
-
-              <CardHeading>Location:</CardHeading>
-              <CardContent>Sample Location</CardContent>
-            </LectureCard>
-            <LectureCard>
-              <CardHeading>Course:</CardHeading>
-              <CardContent>Sample Course</CardContent>
-
-              <CardHeading>Lecture:</CardHeading>
-              <CardContent>Sample Lecture</CardContent>
-
-              <CardHeading>Date:</CardHeading>
-              <CardContent>2024-01-01</CardContent>
-
-              <CardHeading>Location:</CardHeading>
-              <CardContent>Sample Location</CardContent>
-            </LectureCard>
-            <LectureCard>
-              <CardHeading>Course:</CardHeading>
-              <CardContent>Sample Course</CardContent>
-
-              <CardHeading>Lecture:</CardHeading>
-              <CardContent>Sample Lecture</CardContent>
-
-              <CardHeading>Date:</CardHeading>
-              <CardContent>2024-01-01</CardContent>
-
-              <CardHeading>Location:</CardHeading>
-              <CardContent>Sample Location</CardContent>
-            </LectureCard>
-            {/* Add more LectureCard components as needed */}
+                <CardHeading>Location:</CardHeading>
+                <LocationContent>{schedule.location}</LocationContent>
+              </LectureCard>
+            ))}
           </ScrollableContent>
         </LecturesContainer>
       </MainContent>
@@ -131,32 +85,37 @@ const Instructor = ({ }) => {
   );
 };
 
+const LoaderContainer = styled.div`
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const LoaderImage = styled.img`
+  width: 80px; /* Adjust the width as needed */
+  height: 80px; /* Adjust the height as needed */
+`;
+
+// ... (import statements remain the same)
+
 const WelcomeContainer = styled.div`
   height: 100vh;
   width: 100vw;
-  background-color: #f7eef0; /* Soft pinkish background */
-`;
-
-const MainContent = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 20px;
-  overflow: hidden; /* Hide the scrollbar */
-  width: 100%;
+  background-color: #4d394b; /* Charcoal Plum */
+  padding-bottom: 1rem;
 `;
 
 const TopBar = styled.div`
   width: 100%;
-  background: #2c3e50;
-  padding: 20px;
+  background: #eadce6; /* Satin Pearl */
+  padding: 25px;
   display: flex;
   justify-content: space-between;
 `;
 
 const Heading = styled.h1`
-  color: #ecf0f1; /* Light grayish white */
+  color: #fff; /* White */
   font-size: 36px;
   font-weight: bold;
   margin-top: 40px;
@@ -168,38 +127,74 @@ const LecturesContainer = styled.div`
 
 const ScrollableContent = styled.div`
   display: flex;
-  flex-wrap: wrap; /* Enable wrapping for flex container */
-  justify-content: space-between;
+  flex-wrap: wrap;
+  justify-content: space-around;
   gap: 1rem;
-  max-height: 500px; /* Set the maximum height to enable scrolling */
-  overflow-y: auto; /* Enable vertical scrolling */
+  max-height: 450px;
+  overflow-y: auto;
 `;
 
 const LectureCard = styled.div`
-  background-color: #ffffff;
+  background-color: #420f0f; /* Deep Burgundy */
   border-radius: 15px;
-  padding: 20px;
+  padding: 25px; /* Increased padding */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-top: 20px;
-  width: 48%; /* Adjusted width to fit two cards in a row */
-  box-sizing: border-box; /* Include padding and border in the width */
+  margin-top: 10px;
+  width: 40%; /* Reduced width */
+  box-sizing: border-box;
 `;
 
 const SectionHeading = styled.h2`
-  color: #333; /* Dark grayish */
+  color: #fff; /* White */
   font-size: 24px;
   margin-bottom: 15px;
 `;
 
 const CardHeading = styled.h3`
-  color: #333;
-  font-size: 18px;
-  margin-bottom: 8px;
+  color: #fff; /* White */
+  font-size: 25px; /* Increased font size */
+  margin-bottom: 10px; /* Increased margin */
 `;
 
 const CardContent = styled.p`
   margin-bottom: 15px;
-  font-size: 16px;
+  font-size: 18px; /* Increased font size */
+  color: #c0c0c0; /* Silver Mist */
+`;
+
+// Apply unique styles for each card content
+const CourseContent = styled(CardContent)`
+  color: #ffd700; /* Lustrous Gold */
+  font-weight: bold;
+  font-size: 25px; /* Increased font size */
+`;
+
+const LectureContent = styled(CardContent)`
+  color: #000000; /* Ivory Lace */
+  font-style: italic;
+  font-size: 25px; /* Increased font size */
+  font-weight: bold;
+`;
+
+const DateContent = styled(CardContent)`
+  color: #d4a2b0; /* Mauve Mist */
+  font-weight: bold;
+  font-size: 25px; /* Increased font size */
+`;
+
+const LocationContent = styled(CardContent)`
+  color: #c0c0c0; /* Silver Mist */
+  font-size: 16px; /* Adjusted font size */
+`;
+
+const MainContent = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 10px;
+  overflow: hidden;
+  width: 100%;
 `;
 
 export default Instructor;

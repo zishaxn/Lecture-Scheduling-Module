@@ -97,7 +97,6 @@ module.exports.addCourse = async (req, res, next) => {
   }
 };
 
-
 module.exports.getCourse = async (req, res, next) => {
   try {
     // Retrieve the list of courses from the database
@@ -110,8 +109,6 @@ module.exports.getCourse = async (req, res, next) => {
     next(error);
   }
 };
-
-
 
 module.exports.getCourseName = async (req, res, next) => {
   try {
@@ -130,15 +127,12 @@ module.exports.getCourseName = async (req, res, next) => {
   }
 };
 
-
 // schedule
 const CourseSchedule = require("../models/scheduleModel");
 
 module.exports.addSchedule = async (req, res, next) => {
-  console.log('reqest for add schedule');
   try {
     const { course, lecture, date, instructor, location } = req.body;
-    console.log(course, lecture, date, instructor, location);
 
     // Create a new schedule document
     const newSchedule = new CourseSchedule({
@@ -182,3 +176,46 @@ module.exports.getSchedule = async (req, res, next) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+module.exports.getUserSchedule = async (req, res, next) => {
+  try {
+    const { currUser } = req.query;
+    if (!currUser) {
+      return res.status(400).json({ error: "No user is here! To display" });
+    }
+
+    // Assuming you have some endpoint to fetch schedules
+    const schedules = await CourseSchedule.find({ instructor: currUser });
+    // Send the fetched schedule data in the response
+    res.status(200).json({ schedules });
+  } catch (error) {
+    console.error("Error fetching schedule:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+// Assuming you have a route like this
+module.exports.checkAvailable = async (req, res, next) => { 
+  const { username, date } = req.body;
+
+  try {
+    const existingSchedule = await CourseSchedule.findOne({
+      instructor: username,
+      date: new Date(date),
+    });
+
+    if (existingSchedule) {
+      return res
+        .status(409)
+        .json({ error: "Instructor is already busy on this date." });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Instructor is available on this date." });
+  } catch (error) {
+    console.error("Error checking instructor availability:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+}

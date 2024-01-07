@@ -8,10 +8,13 @@ const {
   getCourseName,
   addSchedule,
   getSchedule,
+  getUserSchedule,
+  checkAvailable,
 } = require("../controllers/userController");
 
 const router = require("express").Router();
 
+// authentication
 router.post("/register", register);
 router.post("/login", login);
 router.get("/allinstructors/:id", allInstructors);
@@ -23,7 +26,11 @@ router.get("/getcourse", getCourse);
 router.get("/getcoursename/:courseId", getCourseName);
 
 // schedule
-router.post("/updateschedule", addSchedule);
+router.post("/addschedule", addSchedule);
 router.get("/getschedule",getSchedule);
+router.get("/getuserschedule", getUserSchedule);
+router.post("/checkInstructorAvailability", checkAvailable);
+
+
 
 module.exports = router;

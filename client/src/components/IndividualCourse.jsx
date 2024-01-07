@@ -9,7 +9,8 @@ import {
   getSchedule,
   allInstructors,
   getCourseName,
-  updateSchedule,
+  addSchedule,
+  checkAvailable,
 } from "../utils/APIRoutes";
 import axios from "axios";
 
@@ -259,7 +260,6 @@ const IndividualCourse = () => {
     e.preventDefault();
 
     const course = courseName;
-
     const scheduleData = {
       course: course,
       lecture: lectureData.lecture,
@@ -267,17 +267,33 @@ const IndividualCourse = () => {
       instructor: dropDropUser,
       location: lectureData.location,
     };
+    // Check instructor availability
     try {
-      const response = await axios.post(updateSchedule, scheduleData);
-      console.log("Schedule updated successfully:", response.data);
+      const availabilityCheckResponse = await axios.post(
+        checkAvailable,
+        {
+          username: dropDropUser, // Assuming dropDropUser is the instructor's ID
+          date: lectureData.date,
+        }
+      );
+
+      if (availabilityCheckResponse.status === 200) {
+        // Instructor is available, proceed to add schedule
+        const response = await axios.post(addSchedule, scheduleData);
+        console.log("Schedule added successfully:", response.data);
+      } else {
+        // Instructor is busy, show an error message
+        console.error("Instructor is busy on this date.");
+        // You may want to display an error message to the user
+      }
     } catch (error) {
-      console.error("Error updating schedule:", error);
+      console.error("Error checking instructor availability:", error);
     }
 
     setLectureData({
       instructor: "",
       date: "",
-      subject: "", // Set to the first subject by default
+      subject: "",
       lecture: "",
       location: "",
     });

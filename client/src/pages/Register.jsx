@@ -125,7 +125,7 @@ export default function Register() {
             name="confirmPassword"
             onChange={(e) => handleChange(e)}
           />
-          <div className="checkbox-container">
+          {/* <div className="checkbox-container">
             <Checkbox
               type="checkbox"
               id="isAdmin"
@@ -134,7 +134,7 @@ export default function Register() {
               onChange={(e) => handleChange(e)}
             />
             <label htmlFor="isAdmin">Admin</label>
-          </div>
+          </div> */}
           <SubmitButton type="submit">Create User</SubmitButton>
           <span>
             Already have an account? <Link to="/login">Login.</Link>
