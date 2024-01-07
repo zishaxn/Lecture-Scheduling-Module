@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Instructors from "./Instructors";
 import Courses from "./CoursesAdmin";
+import IndividualCourse from "../IndividualCourse";
 
 export default function Welcome({ user }) {
   const navigate = useNavigate();

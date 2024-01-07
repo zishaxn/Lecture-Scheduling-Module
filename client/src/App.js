@@ -6,6 +6,7 @@ import Admin from "./components/admin/Admin";
 import Main from "./pages/Main";
 import ErrorPage from "./components/ErrorPage";
 import Instructor from "./components/user/Instructor";
+import IndividualCourse from "./components/IndividualCourse";
 export default function App() {
   return (
     /*
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/instructor" element={<Instructor />} />
+        <Route path="/individualcourse/:id" element={<IndividualCourse/>} />
         <Route path="/" element={<Main />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>

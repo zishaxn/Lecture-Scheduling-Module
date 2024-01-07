@@ -8,10 +8,10 @@ const Instructor = ({ instructor }) => {
   const navigate = useNavigate();
   const [currUser, setCurrUser] = useState(undefined);
 
-  useEffect(() => {
-    const adminKey = localStorage.getItem("secret-key-admin");
-    const userKey = localStorage.getItem("secret-key");
+  const adminKey = localStorage.getItem("secret-key-admin");
+  const userKey = localStorage.getItem("secret-key");
 
+  useEffect(() => {
     if (adminKey) {
       navigate("/admin");
     } else if (userKey) {

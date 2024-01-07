@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { addCourse, allInstructors, getCourse } from "../../utils/APIRoutes";
+import { Link } from "react-router-dom";
+import { addCourse, getCourse } from "../../utils/APIRoutes";
 import axios from "axios";
+import IndividualCourse from "../IndividualCourse.jsx";
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  align-items:end ;
+  align-items: end;
   overflow-y: auto;
   max-height: 550px;
 `;
@@ -91,7 +93,17 @@ const Card = styled.div`
   }
 `;
 
+const CardLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+`;
+
 export default function CoursesAdmin({ user }) {
+  
+
+  
+
   const [courseData, setCourseData] = useState({
     name: "",
     level: "",
@@ -181,12 +193,14 @@ export default function CoursesAdmin({ user }) {
       <CardList>
         {courses.map((course) => (
           <Card key={course._id}>
-            <img src={course.image} alt={course.name} />
-            <div className="card-content">
-              <h2>{course.name}</h2>
-              <p>Level: {course.level}</p>
-              <p>{course.description}</p>
-            </div>
+            <CardLink to={`../individualcourse/${course._id}`}>
+              <img src={course.image} alt={course.name} />
+              <div className="card-content">
+                <h2>{course.name}</h2>
+                <p>Level: {course.level}</p>
+                <p>{course.description}</p>
+              </div>
+            </CardLink>
           </Card>
         ))}
       </CardList>

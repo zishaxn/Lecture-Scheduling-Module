@@ -8,6 +8,13 @@ const ScheduleSchema = new mongoose.Schema({
     max: 20,
     unique: true,
   },
+  lecture: {
+    type: String,
+    required: true,
+    min: 3,
+    max: 20,
+    unique: true,
+  },
   date: {
     type: Date, // Use Date type for better handling of dates
     required: true,
