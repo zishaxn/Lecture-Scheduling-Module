@@ -24,9 +24,7 @@ export default function Logout() {
   };
 
   return (
-    // <Button onClick={handleClick}>
       <LogoutButton onClick={handleClick}>Logout</LogoutButton>
-    // </Button>
   );
 }
 
@@ -34,8 +32,7 @@ export default function Logout() {
 const LogoutButton = styled.button`
   background-color: #200079;
   color: white;
-  margin-top: 15px;
-  padding: 0.5rem 2rem;
+  padding: 0.8rem 2rem;
   border: none;
   font-weight: bold;
   cursor: pointer;
@@ -48,18 +45,3 @@ const LogoutButton = styled.button`
   }
 `;
 
-const Button = styled.button`
-  //   display: flex;
-  //   justify-content: center;
-  //   align-items: center;
-  //   padding: 0.5rem;
-  //   border-radius: 0.5rem;
-  //   background-color: #9a86f3;
-  //   border: none;
-  //   cursor: pointer;
-  //   svg {
-  //     font-size: 1.3rem;
-  //     color: #ebe7ff;
-  /* background-color: #200079; */
-  //   }
-`;

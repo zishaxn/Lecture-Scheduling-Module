@@ -25,7 +25,10 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/instructor" element={<Instructor />} />
-        <Route path="/individualcourse/:id" element={<IndividualCourse/>} />
+        <Route
+          path="/individualcourse/:courseId"
+          element={<IndividualCourse />}
+        />
         <Route path="/" element={<Main />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>

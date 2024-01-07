@@ -120,3 +120,21 @@ module.exports.getCourse = async (req, res, next) => {
     next(error);
   }
 };
+
+
+module.exports.getCourseName = async (req, res, next) => {
+  try {
+    const { courseId } = req.params; // Change this line to use req.params instead of req.body
+
+    // Rest of the code remains the same
+    const course = await Course.findById(courseId);
+
+    if (!course) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    return res.json({ courseName: course.name });
+  } catch (error) {
+    next(error);
+  }
+};

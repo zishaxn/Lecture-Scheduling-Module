@@ -7,15 +7,20 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow-y: auto;
+  max-height: 530px;
 `;
 
 const Heading = styled.h1`
-  color: white;
-  font-size: 24px;
+  color: #ffffff; /* White */
+  font-size: 36px;
   margin: 20px 0;
   background-color: #2c3e50;
-  padding: 10px;
+  padding: 15px;
   border-radius: 10px;
+  text-align: center;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 `;
 
 const CardContainer = styled.div`
@@ -28,7 +33,7 @@ const Card = styled.div`
   border-radius: 15px;
   margin-bottom: 20px;
   padding: 20px;
-  width: 100%;
+  width: 95%;
   box-sizing: border-box;
   transition: transform 0.2s ease-in-out;
 
@@ -87,7 +92,7 @@ export default function Instructors({ user }) {
       {instructors.map((instructor, index) => (
         <CardContainer key={index}>
           <Card>
-            <h2>{instructor.username}</h2>
+            <InstructorName>{instructor.username}</InstructorName>
           </Card>
         </CardContainer>
       ))}

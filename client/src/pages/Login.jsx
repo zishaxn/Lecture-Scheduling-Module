@@ -5,7 +5,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { loginRoute } from "../utils/APIRoutes";
-import Admin from "../components/admin/Admin";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -17,6 +16,7 @@ export default function Login() {
     draggable: true,
     theme: "light",
   };
+
   useEffect(() => {
     if (localStorage.getItem("secret-key-admin")) {
       navigate("/admin");
@@ -32,10 +32,10 @@ export default function Login() {
   const validateForm = () => {
     const { username, password } = values;
     if (username === "") {
-      toast.error("Email and Password is required.", toastOptions);
+      toast.error("Username and Password are required.", toastOptions);
       return false;
     } else if (password === "") {
-      toast.error("Email and Password is required.", toastOptions);
+      toast.error("Username and Password are required.", toastOptions);
       return false;
     }
     return true;
@@ -53,9 +53,7 @@ export default function Login() {
         toast.error(data.msg, toastOptions);
       }
       if (data.status === true) {
-        // The localStorage.setItem method takes two parameters:
         if (data.user.isAdmin) {
-          console.log("Okayyyyyyyyyyyyyyyyyy");
           localStorage.setItem("secret-key-admin", JSON.stringify(data.user));
           navigate("/admin");
         } else {
@@ -73,22 +71,22 @@ export default function Login() {
           <div className="brand">
             <h1>Course Schedule</h1>
           </div>
-          <input
+          <Input
             type="text"
             placeholder="Username"
             name="username"
             onChange={(e) => handleChange(e)}
             min="3"
           />
-          <input
+          <Input
             type="password"
             placeholder="Password"
             name="password"
             onChange={(e) => handleChange(e)}
           />
-          <button type="submit">Log In</button>
+          <SubmitButton type="submit">Log In</SubmitButton>
           <span>
-            Don't have an account ? <Link to="/register">Create One.</Link>
+            Don't have an account? <Link to="/register">Create One.</Link>
           </span>
         </form>
       </FormContainer>
@@ -105,18 +103,19 @@ const FormContainer = styled.div`
   justify-content: center;
   gap: 1rem;
   align-items: center;
-  background-color: #131324;
+  background-color: #f3e0db; /* Mink Mirage */
+  padding: 2rem;
+
   .brand {
     display: flex;
     align-items: center;
     gap: 1rem;
     justify-content: center;
-    img {
-      height: 5rem;
-    }
+
     h1 {
-      color: white;
+      color: #d4af37; /* Golden Honey */
       text-transform: uppercase;
+      font-size: 2rem;
     }
   }
 
@@ -124,44 +123,56 @@ const FormContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    background-color: #00000076;
-    border-radius: 2rem;
-    padding: 5rem;
-  }
-  input {
-    background-color: transparent;
-    padding: 1rem;
-    border: 0.1rem solid #4e0eff;
-    border-radius: 0.4rem;
-    color: white;
+    background-color: #fff; /* Silken Ivory */
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 100%;
-    font-size: 1rem;
-    &:focus {
-      border: 0.1rem solid #997af0;
-      outline: none;
-    }
+    max-width: 400px;
+    margin: 0 auto;
   }
-  button {
-    background-color: #4e0eff;
-    color: white;
-    padding: 1rem 2rem;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 0.4rem;
-    font-size: 1rem;
-    text-transform: uppercase;
-    &:hover {
-      background-color: #4e0eff;
-    }
-  }
+
   span {
-    color: white;
+    color: #d4af37; /* Golden Honey */
     text-transform: uppercase;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+
     a {
-      color: #4e0eff;
+      color: #4e0eff; /* Deep Blue Text */
       text-decoration: none;
       font-weight: bold;
     }
+  }
+`;
+
+const Input = styled.input`
+  padding: 1rem;
+  border: 0.1rem solid #d2b48c; /* Tan */
+  border-radius: 0.4rem;
+  color: #4e0eff; /* Deep Blue Text */
+  width: 100%;
+  font-size: 1rem;
+
+  &:focus {
+    border: 0.1rem solid #b76e79; /* Rose Gold Focus Border */
+    outline: none;
+  }
+`;
+
+const SubmitButton = styled.button`
+  background-color: #d4af37; /* Golden Honey */
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 0.4rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+
+  &:hover {
+    background-color: #b76e79; /* Rose Gold Hover */
   }
 `;

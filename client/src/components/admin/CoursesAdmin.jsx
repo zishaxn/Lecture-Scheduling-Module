@@ -3,18 +3,18 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { addCourse, getCourse } from "../../utils/APIRoutes";
 import axios from "axios";
-import IndividualCourse from "../IndividualCourse.jsx";
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: end;
+  align-items: center;
+  justify-content: space-between;
   overflow-y: auto;
   max-height: 550px;
 `;
 
 const Form = styled.form`
-  width: 75%;
+  width: 93%;
   background-color: #2c3e50;
   color: white;
   border: 1px solid transparent;
@@ -50,7 +50,7 @@ const Form = styled.form`
 `;
 
 const CardList = styled.div`
-  width: 80%;
+  width: 100%;
   margin-top: 20px;
   display: flex;
   flex-wrap: wrap;
@@ -68,7 +68,7 @@ const Card = styled.div`
   transition: transform 0.2s ease-in-out;
 
   &:hover {
-    transform: scale(1.05);
+    transform: scale(1.06);
   }
 
   img {
@@ -99,11 +99,7 @@ const CardLink = styled(Link)`
   width: 100%;
 `;
 
-export default function CoursesAdmin({ user }) {
-  
-
-  
-
+const CoursesAdmin = ({ user }) => {
   const [courseData, setCourseData] = useState({
     name: "",
     level: "",
@@ -193,7 +189,11 @@ export default function CoursesAdmin({ user }) {
       <CardList>
         {courses.map((course) => (
           <Card key={course._id}>
-            <CardLink to={`../individualcourse/${course._id}`}>
+            <CardLink
+              to={{
+                pathname: `/individualcourse/${course._id}`, // Update this path
+              }}
+            >
               <img src={course.image} alt={course.name} />
               <div className="card-content">
                 <h2>{course.name}</h2>
@@ -206,4 +206,6 @@ export default function CoursesAdmin({ user }) {
       </CardList>
     </Container>
   );
-}
+};
+
+export default CoursesAdmin;
