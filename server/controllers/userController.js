@@ -77,3 +77,46 @@ module.exports.logOut = (req, res, next) => {
     next(ex);
   }
 };
+
+// -------------------------------------------------------------------
+const Course = require("../models/courseModel");
+
+module.exports.addCourse = async (req, res, next) => {
+  console.log("user is here");
+  try {
+    // Extract course data from the request body
+    const { name, level, description, image } = req.body;
+
+    // Create a new course instance using the Course model
+    const newCourse = new Course({
+      name,
+      level,
+      description,
+      image,
+    });
+
+    // Save the course to the database
+    const savedCourse = await newCourse.save();
+
+    // Send a response indicating successful course creation
+    return res.json({ status: true, savedCourse });
+  } catch (error) {
+    // Handle errors and pass them to the error handling middleware
+    next(error);
+  }
+};
+
+
+module.exports.getCourse = async (req, res, next) => {
+  console.log('request aayi hai boss',req.body);
+  try {
+    // Retrieve the list of courses from the database
+    const courses = await Course.find();
+
+    // Send the list of courses as a response
+    return res.json({ status: true, courses });
+  } catch (error) {
+    // Handle errors and pass them to the error handling middleware
+    next(error);
+  }
+};

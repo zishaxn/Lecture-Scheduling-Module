@@ -3,45 +3,65 @@ import styled from "styled-components";
 import { allInstructors } from "../../utils/APIRoutes";
 import axios from "axios";
 
-// Styled components for the instructor card
-const Card = styled.div`
-  background-color: #ffffff; /* Adjust the background color as needed */
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid transparent;
-  border-radius: 35px;
-  margin: 1rem 5px;
-  text-align: center;
-  padding: 10px 10px;
-`;
-
-const InstructorName = styled.h3`
-  color: #333; /* Adjust the text color as needed */
-  font-size: 18px;
-  margin-bottom: 8px;
-`;
-
 const Container = styled.div`
-  background-color: green;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
 
-  /* Add your container styles here */
-  h1 {
-    width: 50%;
-    background-color: black;
-    color: white;
-    border: 1px solid transparent;
-    border-radius: 35px;
-    margin: 1rem 5px;
-    text-align: center;
-    padding: 10px 10px;
-  }
+const Heading = styled.h1`
+  color: white;
+  font-size: 24px;
+  margin: 20px 0;
+  background-color: #2c3e50;
+  padding: 10px;
+  border-radius: 10px;
 `;
 
 const CardContainer = styled.div`
-  height: 100%;
-  width: 50%;
+  width: 100%;
+`;
+
+const Card = styled.div`
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: transform 0.2s ease-in-out;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 15px 15px 0 0;
+  }
+
+  .card-content {
+    padding: 10px;
+  }
+
+  h2 {
+    margin-bottom: 10px;
+    font-size: 20px;
+  }
+
+  p {
+    margin-bottom: 5px;
+    font-size: 16px;
+  }
+`;
+
+const InstructorName = styled.h3`
+  color: #333;
+  font-size: 18px;
+  margin: 8px;
 `;
 
 export default function Instructors({ user }) {
@@ -51,11 +71,8 @@ export default function Instructors({ user }) {
     const fetchInstructors = async () => {
       try {
         if (user) {
-          console.log(user);
           const response = await axios.get(`${allInstructors}/${user._id}`);
           setInstructors(response.data);
-
-          console.log(instructors);
         }
       } catch (error) {
         console.error("Error fetching instructors:", error);
@@ -66,16 +83,14 @@ export default function Instructors({ user }) {
 
   return (
     <Container>
-      <div>
-        <h1>Instructors</h1>
-        {instructors.map((instructor, index) => (
-          <CardContainer key={index}>
-            <Card>
-              <InstructorName>{instructor.username}</InstructorName>
-            </Card>
-          </CardContainer>
-        ))}
-      </div>
+      <Heading>Instructors</Heading>
+      {instructors.map((instructor, index) => (
+        <CardContainer key={index}>
+          <Card>
+            <h2>{instructor.username}</h2>
+          </Card>
+        </CardContainer>
+      ))}
     </Container>
   );
 }

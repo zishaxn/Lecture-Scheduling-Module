@@ -3,14 +3,12 @@ const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth");
-const courseRoutes = require("./routes/course")
 require("dotenv").config();
 
 app.use(cors());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
-app.use("api/course",courseRoutes);
 
 mongoose
   .connect(

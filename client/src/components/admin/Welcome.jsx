@@ -2,24 +2,22 @@ import React from "react";
 import styled from "styled-components";
 import Logout from "../Logout";
 import { useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Instructors from "./Instructors";
 import Courses from "./CoursesAdmin";
 
 export default function Welcome({ user }) {
   const navigate = useNavigate();
 
-   useEffect(() => {
-     if (localStorage.getItem("secret-key-admin")) {
-       navigate("/admin");
-     } else if (localStorage.getItem("secret-key")) {
-       navigate("/instructor");
-     }
-     else { 
-       navigate("/");
-       
-     }
-   }, []);
+  useEffect(() => {
+    if (localStorage.getItem("secret-key-admin")) {
+      navigate("/admin");
+    } else if (localStorage.getItem("secret-key")) {
+      navigate("/instructor");
+    } else {
+      navigate("/");
+    }
+  }, []);
 
   return (
     <WelcomeContainer>
@@ -28,8 +26,12 @@ export default function Welcome({ user }) {
         <Heading>Welcome Admin</Heading>
       </TopBar>
       <MainContent>
-        <Instructors user={user} />
-        <Courses />
+        <InstructorsContainer>
+          <Instructors user={user} />
+        </InstructorsContainer>
+        <CoursesContainer>
+          <Courses user={user} />
+        </CoursesContainer>
       </MainContent>
     </WelcomeContainer>
   );
@@ -38,26 +40,32 @@ export default function Welcome({ user }) {
 const WelcomeContainer = styled.div`
   height: 100vh;
   width: 100vw;
-  background-color: #e369ae;
+  background: linear-gradient(to bottom right, #e369ae, #8e44ad);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const MainContent = styled.div`
   flex: 1;
   display: flex;
   justify-content: space-between;
-  gap: 1rem; /* Add your desired gap value */
+  gap: 1rem;
   min-height: 100%;
-  min-width: 100%;
-  background-color: red;
+  width: 99.50%;
+`;
 
-  > * {
-    width: 50%;
-  }
+const InstructorsContainer = styled.div`
+  width: 30%;
+`;
+
+const CoursesContainer = styled.div`
+  width: 70%;
 `;
 
 const TopBar = styled.div`
   width: 100%;
-  background: #000;
+  background: #2c3e50;
   padding: 20px;
   display: flex;
   justify-content: space-between;
@@ -65,7 +73,7 @@ const TopBar = styled.div`
 
 const Heading = styled.h1`
   color: white;
-  font-size: 36px;
+  font-size: 24px;
   font-weight: bold;
-  margin-top: 40px;
+  margin-top: 5px;
 `;

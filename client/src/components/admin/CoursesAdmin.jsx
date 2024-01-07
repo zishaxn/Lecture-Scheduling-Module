@@ -1,23 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { addCourse } from "../../utils/APIRoutes";
+import { addCourse, allInstructors, getCourse } from "../../utils/APIRoutes";
 import axios from "axios";
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items:end ;
+  overflow-y: auto;
+  max-height: 550px;
+`;
 
-  form {
-    width: 50%;
-    background-color: black;
-    color: white;
-    border: 1px solid transparent;
-    border-radius: 15px;
-    margin: 1rem;
-    text-align: center;
-    padding: 20px;
-  }
+const Form = styled.form`
+  width: 75%;
+  background-color: #2c3e50;
+  color: white;
+  border: 1px solid transparent;
+  border-radius: 15px;
+  margin: 1rem;
+  text-align: center;
+  padding: 20px;
 
   input,
   select {
@@ -45,6 +47,50 @@ const Container = styled.div`
   }
 `;
 
+const CardList = styled.div`
+  width: 80%;
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+`;
+
+const Card = styled.div`
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  padding: 20px;
+  width: 45%;
+  box-sizing: border-box;
+  transition: transform 0.2s ease-in-out;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 15px 15px 0 0;
+  }
+
+  .card-content {
+    padding: 10px;
+  }
+
+  h2 {
+    margin-bottom: 10px;
+    font-size: 20px;
+  }
+
+  p {
+    margin-bottom: 5px;
+    font-size: 16px;
+  }
+`;
+
 export default function CoursesAdmin({ user }) {
   const [courseData, setCourseData] = useState({
     name: "",
@@ -52,6 +98,7 @@ export default function CoursesAdmin({ user }) {
     description: "",
     image: "",
   });
+  const [courses, setCourses] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,33 +108,36 @@ export default function CoursesAdmin({ user }) {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     try {
-      // Make a request to add the course
       const response = await axios.post(addCourse, { ...courseData });
-
-      // Reset the form after successful submission
       setCourseData({
         name: "",
         level: "",
         description: "",
         image: "",
       });
-
-      // You can also update the courses state if needed
-      // Fetch updated courses data and set it to the state
-      // const updatedCourses = await fetchCourses();
-      // setCourses(updatedCourses);
     } catch (error) {
       console.error("Error adding course:", error);
     }
   };
 
+  const fetchCourses = async () => {
+    try {
+      const response = await axios.get(getCourse);
+      setCourses(response.data.courses);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCourses();
+  }, [courseData, user]);
+
   return (
     <Container>
-      <form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit}>
         <h1>Add a Course</h1>
         <input
           type="text"
@@ -126,7 +176,20 @@ export default function CoursesAdmin({ user }) {
           onChange={handleChange}
         />
         <button type="submit">Add Course</button>
-      </form>
+      </Form>
+
+      <CardList>
+        {courses.map((course) => (
+          <Card key={course._id}>
+            <img src={course.image} alt={course.name} />
+            <div className="card-content">
+              <h2>{course.name}</h2>
+              <p>Level: {course.level}</p>
+              <p>{course.description}</p>
+            </div>
+          </Card>
+        ))}
+      </CardList>
     </Container>
   );
 }
