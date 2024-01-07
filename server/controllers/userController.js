@@ -18,17 +18,14 @@ module.exports.login = async (req, res, next) => {
 };
 
 module.exports.register = async (req, res, next) => {
-  console.log("data aaya hai bhai ", req.body);
   try {
     const { username, email, password, isAdmin } = req.body;
     const usernameCheck = await User.findOne({ username });
     if (usernameCheck) {
-      console.log("idiot! use naother name");
       return res.json({ msg: "Username already used", status: false });
     }
     const emailCheck = await User.findOne({ email });
     if (emailCheck) {
-      console.log("idiot! use naother name");
       return res.json({ msg: "Email already used", status: false });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -46,7 +43,6 @@ module.exports.register = async (req, res, next) => {
 };
 
 module.exports.allInstructors = async (req, res, next) => {
-  console.log('request');
   try {
     // useful to get all lecture data
     //After executing this query, the users variable will contain an array of user objects, each containing the specified fields (email, username, avatarImage, and _id).
@@ -62,14 +58,10 @@ module.exports.allInstructors = async (req, res, next) => {
 };
 
 module.exports.logOut = (req, res, next) => {
-  console.log("request is here");
-  console.log(req.body);
   try {
-    console.log("req", req.params.id);
     if (!req.params.id) {
       return res.json({ msg: "User id is required " });
     }
-    console.log('req is here');
     // localStorage.clear();
     // onlineUsers.delete(req.params.id);
     return res.status(200).send();
@@ -82,7 +74,6 @@ module.exports.logOut = (req, res, next) => {
 const Course = require("../models/courseModel");
 
 module.exports.addCourse = async (req, res, next) => {
-  console.log("user is here");
   try {
     // Extract course data from the request body
     const { name, level, description, image } = req.body;
@@ -108,7 +99,6 @@ module.exports.addCourse = async (req, res, next) => {
 
 
 module.exports.getCourse = async (req, res, next) => {
-  console.log('request aayi hai boss',req.body);
   try {
     // Retrieve the list of courses from the database
     const courses = await Course.find();
@@ -120,6 +110,7 @@ module.exports.getCourse = async (req, res, next) => {
     next(error);
   }
 };
+
 
 
 module.exports.getCourseName = async (req, res, next) => {
@@ -136,5 +127,58 @@ module.exports.getCourseName = async (req, res, next) => {
     return res.json({ courseName: course.name });
   } catch (error) {
     next(error);
+  }
+};
+
+
+// schedule
+const CourseSchedule = require("../models/scheduleModel");
+
+module.exports.addSchedule = async (req, res, next) => {
+  console.log('reqest for add schedule');
+  try {
+    const { course, lecture, date, instructor, location } = req.body;
+    console.log(course, lecture, date, instructor, location);
+
+    // Create a new schedule document
+    const newSchedule = new CourseSchedule({
+      course,
+      lecture,
+      date: new Date(date), // Convert date string to Date object
+      instructor,
+      location,
+    });
+
+    // Save the new schedule to the database
+    const savedSchedule = await newSchedule.save();
+
+    // Respond with the saved schedule
+    res.status(201).json(savedSchedule);
+  } catch (error) {
+    // Handle any errors that occur during the process
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+// const CourseSchedule = require("../models/scheduleModel");
+
+module.exports.getSchedule = async (req, res, next) => {
+  try {
+    const { courseName } = req.query;
+
+    // Validate if courseName is provided
+    if (!courseName) {
+      return res.status(400).json({ error: "Course name is required." });
+    }
+
+    // Assuming you have some endpoint to fetch schedules
+    const schedules = await CourseSchedule.find({ course: courseName });
+
+    // Send the fetched schedule data in the response
+    res.status(200).json({ schedules });
+  } catch (error) {
+    console.error("Error fetching schedule:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };

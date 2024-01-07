@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Logout from "../Logout";
 
-const Instructor = ({ instructor }) => {
+const Instructor = ({ }) => {
   const navigate = useNavigate();
   const [currUser, setCurrUser] = useState(undefined);
 
@@ -15,7 +15,8 @@ const Instructor = ({ instructor }) => {
     if (adminKey) {
       navigate("/admin");
     } else if (userKey) {
-      setCurrUser(JSON.parse(userKey).username);
+      setCurrUser(JSON.parse(userKey)._id);
+      console.log(currUser);
     } else {
       navigate("/");
     }

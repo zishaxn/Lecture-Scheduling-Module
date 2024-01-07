@@ -8,7 +8,7 @@ export const allInstructors = `${host}/api/auth/allinstructors`;
 export const addCourse = `${host}/api/auth/addcourse`;
 export const getCourse = `${host}/api/auth/getcourse`;
 export const getCourseName = `${host}/api/auth/getcoursename`;
-export const getCourseSchedule = `${host}/api/auth/getcourseschedule`;
+export const getSchedule = `${host}/api/auth/getschedule`;
 
-export const updateSchedule = `${host}/api/auth/updateSchedule`;
+export const updateSchedule = `${host}/api/auth/updateschedule`;
 
