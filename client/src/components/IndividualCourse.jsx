@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Logout from "./Logout";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import {
-  getCourseSchedule,
+  getSchedule,
   allInstructors,
   getCourseName,
   updateSchedule,
@@ -49,7 +49,6 @@ const Heading = styled.h1`
   margin-top: 5px;
 `;
 
-
 const CourseName = styled.h1`
   margin-bottom: 20px;
   color: ${ivoryCream};
@@ -65,26 +64,48 @@ const ContentWrapper = styled.div`
 const CardList = styled.div`
   width: 100%;
   margin-top: 20px;
-  overflow-x: auto;
-  white-space: nowrap;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around; /* You can experiment with different values */
+  align-items: flex-start; /* Added align-items property */
 `;
 
 const Card = styled.div`
   background-color: #ffffff;
   border: 1px solid #ccc;
   border-radius: 15px;
-  margin-right: 20px;
+  margin-bottom: 20px;
   padding: 20px;
-  width: 45%;
+  width: calc(45% - 20px); /* Adjusted width calculation to include margin */
   box-sizing: border-box;
-  display: inline-block;
   transition: transform 0.2s ease-in-out;
+  overflow: hidden;
 
   &:hover {
     transform: scale(1.06);
   }
-`;
 
+  img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 15px 15px 0 0;
+  }
+
+  .card-content {
+    padding: 10px;
+  }
+
+  h2 {
+    margin-bottom: 10px;
+    font-size: 20px;
+  }
+
+  p {
+    margin-bottom: 5px;
+    font-size: 16px;
+  }
+`;
 
 const Form = styled.form`
   width: 45%;
@@ -124,13 +145,14 @@ const Form = styled.form`
 const IndividualCourse = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
-  const [currUser, setCurrUser] = useState(undefined);
+  // const [currUser, setCurrUser] = useState(undefined);
   const [instructors, setInstructors] = useState([]);
+  const [dropDropUser, setDropUser] = useState(undefined);
   const [id, setId] = useState(null);
   const [courseName, setCourseName] = useState("Dummy Course");
   const [instructorData, setInstructorData] = useState([]);
   const [selectedInstructor, setSelectedInstructor] = useState("");
-  const [host, setHost] = useState(""); // Ensure that you import host from your APIRoutes file
+  const [schedule,setSchedule]=useState([])
 
   const adminKey = localStorage.getItem("secret-key-admin");
   const userKey = localStorage.getItem("secret-key");
@@ -138,7 +160,7 @@ const IndividualCourse = () => {
   useEffect(() => {
     if (adminKey) {
       const adminUserData = JSON.parse(adminKey);
-      setCurrUser(adminUserData);
+      // setCurrUser(adminUserData);
       setId(adminUserData._id);
     } else if (userKey) {
       navigate("/instructor");
@@ -195,24 +217,6 @@ const IndividualCourse = () => {
     fetchInstructors();
   }, [id]);
 
-  const [courseDetails, setCourseDetails] = useState({
-    courseName: "Sample Course",
-    instructors: [
-      {
-        name: "Instructor 1",
-        date: "January 1, 2022",
-        location: "Location 1",
-        lecture: "DSA",
-      },
-      {
-        name: "Instructor 2",
-        date: "February 1, 2022",
-        location: "Location 2",
-        lecture: "Web Dev",
-      },
-    ],
-  });
-
   const [lectureData, setLectureData] = useState({
     instructor: "",
     date: "",
@@ -229,6 +233,15 @@ const IndividualCourse = () => {
     }));
   };
 
+  const handleInstructorSelection = (e) => {
+    const selectedInstructor = e.target.value;
+    setDropUser(selectedInstructor);
+    setSelectedInstructor(selectedInstructor); // Assuming you also want to update the selected instructor for other purposes
+  };
+
+  useEffect(() => {
+  }, [setDropUser]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -239,17 +252,15 @@ const IndividualCourse = () => {
       course: subject,
       lecture: lectureData.lecture,
       date: lectureData.date,
-      instructor: lectureData.instructor,
+      instructor: dropDropUser,
       location: lectureData.location,
     };
-    console.log(scheduleData);
-
-    // try {
-    //   const response = await axios.post(updateSchedule, scheduleData);
-    //   console.log("Schedule updated successfully:", response.data);
-    // } catch (error) {
-    //   console.error("Error updating schedule:", error);
-    // }
+    try {
+      const response = await axios.post(updateSchedule, scheduleData);
+      console.log("Schedule updated successfully:", response.data);
+    } catch (error) {
+      console.error("Error updating schedule:", error);
+    }
 
     setLectureData({
       instructor: "",
@@ -260,6 +271,22 @@ const IndividualCourse = () => {
     });
   };
 
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      try {
+        const response = await axios.get(getSchedule, {
+          params: { courseName },
+        });
+        setSchedule(response.data.schedules);
+      } catch (error) {
+        console.error("Error fetching Schedule:", error);
+      }
+    };
+
+    // Run the effect on component mount and whenever there's a change in schedule or courseName
+    fetchSchedules();
+  }, [courseName,dropDropUser,handleSubmit]); 
+
   return (
     <Container>
       <TopBar>
@@ -269,21 +296,24 @@ const IndividualCourse = () => {
       </TopBar>
       <ContentWrapper>
         <CardList>
-          {courseDetails.instructors.map((instructor, index) => (
-            <div key={index}>
-              <h2>{instructor.name}</h2>
-              <p>Date: {instructor.date}</p>
-              <p>Location: {instructor.location}</p>
-              <p>Lecture: {instructor.lecture}</p>
-            </div>
+          {schedule.map((scheduleItem, index) => (
+            <Card key={index}>
+              <div className="card-content">
+                <h2>Lecture: {scheduleItem.lecture}</h2>
+                <p>Instructor: {scheduleItem.instructor}</p>
+                <p>Date: {new Date(scheduleItem.date).toLocaleDateString()}</p>
+                <p>Location: {scheduleItem.location}</p>
+              </div>
+            </Card>
           ))}
         </CardList>
+
         <Form onSubmit={handleSubmit}>
           <h2>Schedule a Lecture</h2>
           <select
             name="instructor"
             value={selectedInstructor}
-            onChange={(e) => setSelectedInstructor(e.target.value)}
+            onChange={handleInstructorSelection}
             required
           >
             <option value="" disabled>
