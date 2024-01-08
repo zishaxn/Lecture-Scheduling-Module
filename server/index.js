@@ -12,7 +12,7 @@ app.use(express.json());
 // CORS Configuration
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "https://temp-course-mngt-frontend.vercel.app/",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   })
