@@ -107,7 +107,8 @@ export default function Instructors({ user }) {
           <Card key={instructor._id}>
             <CardLink
               to={{
-                pathname: `/individualinstructor/${instructor._id}`, // Update this path
+                pathname: `/individualinstructor/${instructor.username}`,
+                state: { instructorUsername: instructor.username }, // Pass username as state
               }}
             >
               {/* <img src={instructor.profileImage} alt={instructor.username} /> */}

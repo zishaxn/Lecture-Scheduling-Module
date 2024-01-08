@@ -82,8 +82,8 @@ const TopBar = styled.div`
 `;
 
 const Heading = styled.h1`
-  color: #ffffff; /* White */
-  font-size: 24px;
+  color: #559f49; /* White */
+  font-size: 28px;
   font-weight: bold;
-  margin-top: 5px;
+  margin-top: 8px;
 `;

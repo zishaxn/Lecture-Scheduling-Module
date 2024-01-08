@@ -31,7 +31,7 @@ export default function App() {
           element={<IndividualCourse />}
         />
         <Route
-          path="/individualinstructor/:courseId"
+          path="/individualinstructor/:username"
           element={<IndividualInstructor />}
         />
         <Route path="/" element={<Main />} />

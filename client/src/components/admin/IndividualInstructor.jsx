@@ -1,400 +1,201 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 import Logout from "../Logout";
-import { useNavigate, useParams } from "react-router-dom";
-import {
-  getSchedule,
-  allInstructors,
-  getCourseName,
-  addSchedule,
-  checkAvailable,
-} from "../../utils/APIRoutes";
+import { getUserSchedule } from "../../utils/APIRoutes";
 import axios from "axios";
 
-// Define color schemes
-const ceruleanBlue = "#007ba7";
-const ivoryCream = "#fffdd0";
-const darkGray = "#333333";
-const sageGreen = "#8f9779";
-const dustyRose = "#d2b48c";
-const velvetNavy = "#001f3f";
-const white = "#ffffff";
+import loaderImage from "../../assets/loader.gif";
+import { useParams } from "react-router-dom";
 
-// Styled components with color schemes
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0;
+const IndividualInstructor = () => {
+  const navigate = useNavigate();
+  const { username } = useParams();
+  const [currUser, setCurrUser] = useState(undefined);
+  const [schedules, setSchedules] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const adminKey = localStorage.getItem("secret-key-admin");
+
+  useEffect(() => {
+    if (!adminKey) {
+      localStorage.clear();
+      navigate("/");
+    }
+  }, [adminKey, navigate]);
+
+  useEffect(() => {
+    // Set currUser using the extracted 'name' parameter
+    setCurrUser(username);
+
+    const fetchSchedules = async () => {
+      try {
+        const response = await axios.get(getUserSchedule, {
+          params: { currUser: username }, // Use 'name' instead of 'currUser' in the params
+        });
+        setSchedules(response.data.schedules);
+      } catch (error) {
+        console.error("Error fetching Schedule:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSchedules();
+  }, [currUser, navigate]); // Include 'name' in the dependency array
+
+  if (loading) {
+    return (
+      <LoaderContainer>
+        <LoaderImage src={loaderImage} alt="Loading..." />
+      </LoaderContainer>
+    );
+  }
+
+  return (
+    <WelcomeContainer>
+      <TopBar>
+        <Logout />
+        <Heading>Welcome Admin</Heading>
+      </TopBar>
+      <MainContent>
+        <LecturesContainer>
+          <SectionHeading>Upcoming Lectures For { currUser}</SectionHeading>
+          <ScrollableContent>
+            {schedules.map((schedule, index) => (
+              <LectureCard key={index}>
+                <CardHeading>Course:</CardHeading>
+                <CourseContent>{schedule.course}</CourseContent>
+
+                <CardHeading>Lecture:</CardHeading>
+                <LectureContent>{schedule.lecture}</LectureContent>
+
+                <CardHeading>Date:</CardHeading>
+                <DateContent>
+                  {new Date(schedule.date).toLocaleDateString()}
+                </DateContent>
+
+                <CardHeading>Location:</CardHeading>
+                <LocationContent>{schedule.location}</LocationContent>
+              </LectureCard>
+            ))}
+          </ScrollableContent>
+        </LecturesContainer>
+      </MainContent>
+    </WelcomeContainer>
+  );
+};
+
+const LoaderContainer = styled.div`
   height: 100vh;
-  background-color: ${ceruleanBlue};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const LoaderImage = styled.img`
+  width: 80px; /* Adjust the width as needed */
+  height: 80px; /* Adjust the height as needed */
+`;
+
+// ... (import statements remain the same)
+
+const WelcomeContainer = styled.div`
+  height: 100vh;
+  width: 100vw;
+  background-color: #0a0303; /* Charcoal Plum */
+  padding-bottom: 1rem;
 `;
 
 const TopBar = styled.div`
   width: 100%;
-  background: ${velvetNavy};
-  padding: 20px;
+  background: #eadce6; /* Satin Pearl */
+  padding: 25px;
   display: flex;
   justify-content: space-between;
 `;
 
 const Heading = styled.h1`
-  color: ${white};
-  font-size: 24px;
+  color: #d30e0e; /* White */
+  font-size: 36px;
   font-weight: bold;
-  margin-top: 5px;
+  margin-top: 10px;
 `;
 
-const CourseName = styled.h1`
-  margin-bottom: 20px;
-  color: ${ivoryCream};
+const LecturesContainer = styled.div`
+  width: 100%;
 `;
 
-const ContentWrapper = styled.div`
+const ScrollableContent = styled.div`
   display: flex;
-  justify-content: space-between;
-  width: 100%;
-  padding: 20px;
+  flex-wrap: wrap-reverse;
+  justify-content: space-around;
+  gap: 1rem;
+  max-height: 450px;
+  overflow-y: auto;
 `;
 
-const CardList = styled.div`
-  width: 100%;
-  margin-top: 20px;
+const LectureCard = styled.div`
+  background-color: #e98585; /* Deep Burgundy */
+  border-radius: 15px;
+  padding: 25px; /* Increased padding */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 10px;
+  width: 40%; /* Reduced width */
+  box-sizing: border-box;
+`;
+
+const SectionHeading = styled.h2`
+  color: #fff; /* White */
+  font-size: 24px;
+  margin: 15px;
+`;
+
+const CardHeading = styled.h3`
+  color: #fff; /* White */
+  font-size: 25px; /* Increased font size */
+  margin-bottom: 10px; /* Increased margin */
+`;
+
+const CardContent = styled.p`
+  margin-bottom: 15px;
+  font-size: 18px; /* Increased font size */
+  color: #c0c0c0; /* Silver Mist */
+`;
+
+// Apply unique styles for each card content
+const CourseContent = styled(CardContent)`
+  color: #ffd700; /* Lustrous Gold */
+  font-weight: bold;
+  font-size: 25px; /* Increased font size */
+`;
+
+const LectureContent = styled(CardContent)`
+  color: #000000; /* Ivory Lace */
+  font-style: italic;
+  font-size: 25px; /* Increased font size */
+  font-weight: bold;
+`;
+
+const DateContent = styled(CardContent)`
+  color: #d4a2b0; /* Mauve Mist */
+  font-weight: bold;
+  font-size: 25px; /* Increased font size */
+`;
+
+const LocationContent = styled(CardContent)`
+  color: #c0c0c0; /* Silver Mist */
+  font-size: 16px; /* Adjusted font size */
+`;
+
+const MainContent = styled.div`
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;
-  align-items: flex-start;
-`;
-
-const NoScheduleMessage = styled.p`
-  width: 100%;
-  text-align: center;
-  font-size: 18px;
-  color: ${white};
-`;
-
-const Card = styled.div`
-  background-color: #ffffff;
-  border: 1px solid #ccc;
-  border-radius: 15px;
-  margin-bottom: 20px;
-  padding: 20px;
-  width: calc(45% - 20px);
-  box-sizing: border-box;
-  transition: transform 0.2s ease-in-out;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 10px;
   overflow: hidden;
-
-  &:hover {
-    transform: scale(1.06);
-  }
-
-  img {
-    width: 100%;
-    max-height: 200px;
-    object-fit: cover;
-    border-radius: 15px 15px 0 0;
-  }
-
-  .card-content {
-    padding: 10px;
-  }
-
-  h2 {
-    margin-bottom: 10px;
-    font-size: 20px;
-  }
-
-  p {
-    margin-bottom: 5px;
-    font-size: 16px;
-  }
+  width: 100%;
 `;
 
-const Form = styled.form`
-  width: 45%;
-  background-color: ${sageGreen};
-  color: ${darkGray};
-  border: 1px solid transparent;
-  border-radius: 15px;
-  text-align: center;
-  padding: 20px;
-
-  select,
-  input {
-    margin: 10px 0;
-    padding: 10px;
-    width: calc(100% - 20px);
-    border-radius: 5px;
-    border: 1px solid ${darkGray};
-    box-sizing: border-box;
-  }
-
-  button {
-    margin-top: 20px;
-    padding: 10px;
-    background-color: ${dustyRose};
-    color: ${white};
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-
-    &:hover {
-      background-color: ${sageGreen};
-    }
-  }
-`;
-
-// IndividualCourse component
-const IndividualInstructor = () => {
-  // Hooks for managing state
-  const { courseId } = useParams();
-  const navigate = useNavigate();
-  const [dropDropUser, setDropUser] = useState(undefined);
-  const [id, setId] = useState(null);
-  const [courseName, setCourseName] = useState("Dummy Course");
-  const [instructorData, setInstructorData] = useState([]);
-  const [selectedInstructor, setSelectedInstructor] = useState("");
-  const [schedule, setSchedule] = useState([]);
-
-  // Keys for local storage
-  const adminKey = localStorage.getItem("secret-key-admin");
-  const userKey = localStorage.getItem("secret-key");
-
-  // Effect hook to check user authentication
-  useEffect(() => {
-    if (adminKey) {
-      const adminUserData = JSON.parse(adminKey);
-      setId(adminUserData._id);
-    } else if (userKey) {
-      navigate("/instructor");
-    } else {
-      navigate("/");
-    }
-  }, [navigate, adminKey, userKey]);
-
-  // Function to update instructor data
-  const updateInstructorData = (instructor) => {
-    const existingInstructor = instructorData.find(
-      (i) => i === instructor.username
-    );
-    if (!existingInstructor) {
-      setInstructorData((prevData) => [...prevData, instructor.username]);
-    }
-  };
-
-  // Function to get course name by ID
-  const getCourseNameById = async (courseId) => {
-    try {
-      const response = await axios.get(`${getCourseName}/${courseId}`);
-      return response.data.courseName;
-    } catch (error) {
-      console.error("Error fetching course name:", error);
-      return null;
-    }
-  };
-
-  // Effect hook to fetch course name
-  useEffect(() => {
-    const fetchCourseName = async () => {
-      try {
-        if (courseId) {
-          setCourseName(await getCourseNameById(courseId));
-        }
-      } catch (error) {
-        console.error("Error fetching course name:", error);
-      }
-    };
-    fetchCourseName();
-  }, [courseId]);
-
-  // Effect hook to fetch instructors
-  useEffect(() => {
-    const fetchInstructors = async () => {
-      try {
-        if (id) {
-          const response = await axios.get(`${allInstructors}/${id}`);
-          const fetchedInstructors = response.data;
-          fetchedInstructors.forEach(updateInstructorData);
-        }
-      } catch (error) {
-        console.error("Error fetching instructors:", error);
-      }
-    };
-    fetchInstructors();
-  }, [id]);
-
-  // State for lecture data
-  const [lectureData, setLectureData] = useState({
-    instructor: "",
-    date: "",
-    subject: "", // Set to the first subject by default
-    lecture: "",
-    location: "",
-  });
-
-  // Event handler for input changes
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setLectureData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Event handler for instructor selection
-  const handleInstructorSelection = (e) => {
-    const selectedInstructor = e.target.value;
-    setDropUser(selectedInstructor);
-    setSelectedInstructor(selectedInstructor);
-  };
-
-  // Effect hook for instructor selection
-  useEffect(() => {}, [setDropUser]);
-
-  // Event handler for form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const course = courseName;
-    const scheduleData = {
-      course: course,
-      lecture: lectureData.lecture,
-      date: lectureData.date,
-      instructor: dropDropUser,
-      location: lectureData.location,
-    };
-    // Check instructor availability
-    try {
-      const availabilityCheckResponse = await axios.post(checkAvailable, {
-        username: dropDropUser, // Assuming dropDropUser is the instructor's ID
-        date: lectureData.date,
-      });
-
-      if (availabilityCheckResponse.status === 200) {
-        // Instructor is available, proceed to add schedule
-        const response = await axios.post(addSchedule, scheduleData);
-        console.log("Schedule added successfully:", response.data);
-      } else {
-        // Instructor is busy, show an error message
-        console.error("Instructor is busy on this date.");
-        // You may want to display an error message to the user
-      }
-    } catch (error) {
-      console.error("Error checking instructor availability:", error);
-    }
-
-    setLectureData({
-      instructor: "",
-      date: "",
-      subject: "",
-      lecture: "",
-      location: "",
-    });
-  };
-
-  // Effect hook to fetch schedules
-  useEffect(() => {
-    const fetchSchedules = async () => {
-      try {
-        const response = await axios.get(getSchedule, {
-          params: { courseName },
-        });
-        setSchedule(response.data.schedules);
-      } catch (error) {
-        console.error("Error fetching Schedule:", error);
-      }
-    };
-    fetchSchedules();
-  }, [courseName, dropDropUser, handleSubmit]);
-
-  // JSX for rendering the component
-  return (
-    <Container>
-      <TopBar>
-        <Logout />
-        <CourseName>{courseName}</CourseName>
-        <Heading>Welcome admin</Heading>
-      </TopBar>
-      <ContentWrapper>
-        {schedule.length === 0 ? (
-          <NoScheduleMessage>No lectures scheduled.</NoScheduleMessage>
-        ) : (
-          <CardList>
-            {schedule.map((scheduleItem, index) => (
-              <Card key={index}>
-                <div className="card-content">
-                  <h2>Lecture: {scheduleItem.lecture}</h2>
-                  <p>Instructor: {scheduleItem.instructor}</p>
-                  <p>
-                    Date: {new Date(scheduleItem.date).toLocaleDateString()}
-                  </p>
-                  <p>Location: {scheduleItem.location}</p>
-                </div>
-              </Card>
-            ))}
-          </CardList>
-        )}
-
-        {/* Form for scheduling a lecture */}
-        <Form onSubmit={handleSubmit}>
-          <h2>Schedule a Lecture</h2>
-          <select
-            name="instructor"
-            value={selectedInstructor}
-            onChange={handleInstructorSelection}
-            required
-          >
-            <option value="" disabled>
-              Select Instructor
-            </option>
-            {instructorData.map((instructor, index) => (
-              <option key={index} value={instructor}>
-                {instructor}
-              </option>
-            ))}
-          </select>
-          <input
-            type="date"
-            name="date"
-            placeholder="Date"
-            value={lectureData.date}
-            onChange={handleChange}
-            required
-          />
-          <select
-            name="subject"
-            value={lectureData.subject}
-            onChange={handleChange}
-            required
-          >
-            <option value="" disabled>
-              Select Course
-            </option>
-            <option>{courseName}</option>
-          </select>
-          <input
-            type="text"
-            name="lecture"
-            placeholder="Lecture"
-            value={lectureData.lecture}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="text"
-            name="location"
-            placeholder="Location"
-            value={lectureData.location}
-            onChange={handleChange}
-            required
-          />
-          <button type="submit">Schedule Lecture</button>
-        </Form>
-      </ContentWrapper>
-    </Container>
-  );
-};
-
-// Export the IndividualCourse component
 export default IndividualInstructor;
