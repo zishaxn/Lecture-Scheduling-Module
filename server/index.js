@@ -12,7 +12,10 @@ app.use(express.json());
 // CORS Configuration
 app.use(
   cors({
-    origin: "https://temp-course-mngt-frontend.vercel.app/",
+    origin: [
+      "http://localhost:3000",
+      "https://online-lecture-scheduling-module-cfte.vercel.app/",
+    ],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   })

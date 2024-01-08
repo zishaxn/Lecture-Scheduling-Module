@@ -1,4 +1,5 @@
-export const host = "http://localhost:8000";
+// export const host = "http://localhost:8000";
+export const host = "https://online-lecture-scheduling-module.vercel.app";
 
 // authentication
 export const registerRoute = `${host}/api/auth/register`;
