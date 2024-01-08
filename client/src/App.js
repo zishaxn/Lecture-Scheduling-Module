@@ -7,6 +7,7 @@ import Main from "./pages/Main";
 import ErrorPage from "./components/ErrorPage";
 import Instructor from "./components/user/Instructor";
 import IndividualCourse from "./components/IndividualCourse";
+import IndividualInstructor from "./components/admin/IndividualInstructor";
 export default function App() {
   return (
     /*
@@ -28,6 +29,10 @@ export default function App() {
         <Route
           path="/individualcourse/:courseId"
           element={<IndividualCourse />}
+        />
+        <Route
+          path="/individualinstructor/:courseId"
+          element={<IndividualInstructor />}
         />
         <Route path="/" element={<Main />} />
         <Route path="*" element={<ErrorPage />} />

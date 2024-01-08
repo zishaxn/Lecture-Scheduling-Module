@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { allInstructors } from "../../utils/APIRoutes";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const Container = styled.div`
   display: flex;
@@ -14,17 +15,22 @@ const Container = styled.div`
 const Heading = styled.h1`
   color: #ffffff; /* White */
   font-size: 36px;
-  margin: 20px 0;
+  margin: 20px;
   background-color: #2c3e50;
   padding: 15px;
   border-radius: 10px;
   text-align: center;
   letter-spacing: 1px;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  width: 92%;
 `;
 
-const CardContainer = styled.div`
+const CardList = styled.div`
   width: 100%;
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
 `;
 
 const Card = styled.div`
@@ -33,7 +39,7 @@ const Card = styled.div`
   border-radius: 15px;
   margin-bottom: 20px;
   padding: 20px;
-  width: 95%;
+  width: 45%;
   box-sizing: border-box;
   transition: transform 0.2s ease-in-out;
 
@@ -63,10 +69,17 @@ const Card = styled.div`
   }
 `;
 
+const CardLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+`;
+
 const InstructorName = styled.h3`
-  color: #333;
-  font-size: 18px;
-  margin: 8px;
+  color: #010101;
+  font-size: 25px;
+  /* margin: 8px; */
+  text-align: center;
 `;
 
 export default function Instructors({ user }) {
@@ -89,13 +102,24 @@ export default function Instructors({ user }) {
   return (
     <Container>
       <Heading>Instructors</Heading>
-      {instructors.map((instructor, index) => (
-        <CardContainer key={index}>
-          <Card>
-            <InstructorName>{instructor.username}</InstructorName>
+      <CardList>
+        {instructors.map((instructor) => (
+          <Card key={instructor._id}>
+            <CardLink
+              to={{
+                pathname: `/individualinstructor/${instructor._id}`, // Update this path
+              }}
+            >
+              {/* <img src={instructor.profileImage} alt={instructor.username} /> */}
+              <div className="card-content">
+                {/* <h2>{instructor.username}</h2> */}
+                <InstructorName>{instructor.username}</InstructorName>
+                {/* <p>{instructor.bio}</p> */}
+              </div>
+            </CardLink>
           </Card>
-        </CardContainer>
-      ))}
+        ))}
+      </CardList>
     </Container>
   );
 }
