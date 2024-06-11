@@ -24,7 +24,7 @@ app.use(
 // MongoDB Connection
 const mongoURI =
   process.env.MONGODB_URI ||
-  "mongodb+srv://zishan:zishan8291@cluster0.pamvqgm.mongodb.net/course-app?retryWrites=true&w=majority";
+  "mongodb+srv://zishan:zishan8291@projects.ancgnhi.mongodb.net/?retryWrites=true&w=majority&appName=Projects";
 
 mongoose
   .connect(mongoURI, {
